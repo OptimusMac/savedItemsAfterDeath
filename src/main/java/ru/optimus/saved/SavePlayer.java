@@ -4,10 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -41,5 +38,11 @@ public class SavePlayer implements Serializable {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public Collection<ItemStack> getAllItems() {
+        Collection<ItemStack> result = new ArrayList<>(mainItemStacks);
+        result.addAll(armorItemStacks);
+        return result;
     }
 }

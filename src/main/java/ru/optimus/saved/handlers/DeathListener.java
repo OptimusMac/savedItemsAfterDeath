@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import ru.optimus.saved.Main;
 import ru.optimus.saved.SavePlayer;
 import ru.optimus.utils.SerializationUtils;
 
@@ -24,6 +25,7 @@ public class DeathListener implements Listener {
         String serializedSave = SerializationUtils.serializeClass(savePlayer);
         nbtCompound.setString("serializedItems", serializedSave);
         nbtEntity.mergeCompound(nbtCompound);
+        e.getDrops().removeIf(ex -> !Main.getInstance().getMaterialNoSave().contains(ex.getType().name()));
     }
 
 
