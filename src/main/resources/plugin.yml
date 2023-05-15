@@ -1,0 +1,3 @@
+name: SavedItemsAfterDeath
+version: '${project.version}'
+main: ru.optimus.saved.Main
