@@ -1,40 +1,41 @@
 package ru.optimus.utils;
 
-import ru.optimus.saved.SavePlayer;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import java.io.*;
 import java.util.Base64;
-import java.util.IllegalFormatException;
 
 public class SerializationUtils {
 
-    public static String serializeClass(SavePlayer savePlayer) {
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-             ObjectOutputStream oos = new ObjectOutputStream(bos)) {
-            oos.writeObject(savePlayer);
-            byte[] bytes = bos.toByteArray();
-            return Base64.getEncoder().encodeToString(bytes);
+    public static String serializeClass(ItemStack itemStack) {
+        String encodedObject;
+        try {
+            ByteArrayOutputStream io = new ByteArrayOutputStream();
+            BukkitObjectOutputStream os = null;
+            os = new BukkitObjectOutputStream(io);
+            os.writeObject(itemStack);
+            os.flush();
+            byte[] serializedObject = io.toByteArray();
+            encodedObject = Base64.getEncoder().encodeToString(serializedObject);
+            return encodedObject;
         } catch (IOException e) {
-            System.out.println("Ошибка при сериализации объекта: " + e.getMessage());
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
-    public static SavePlayer deserializeClass(String serializedString) {
+
+    public static ItemStack deserializeClass(String serializedString) {
+        byte[] serializedObjectOutput = Base64.getDecoder().decode(serializedString);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedObjectOutput);
+        BukkitObjectInputStream bukkitObjectInputStream = null;
         try {
-            byte[] bytes = Base64.getDecoder().decode(serializedString);
-            try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-                 ObjectInputStream ois = new ObjectInputStream(bis)) {
-                Object obj = ois.readObject();
-                if (obj instanceof SavePlayer) {
-                    return (SavePlayer) obj;
-                } else {
-                    throw new ClassNotFoundException("Неверный тип объекта при десериализации");
-                }
-            }
+            bukkitObjectInputStream = new BukkitObjectInputStream(byteArrayInputStream);
+            ItemStack item = (ItemStack) bukkitObjectInputStream.readObject();
+            return item;
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Ошибка при десериализации объекта: " + e.getMessage());
-            return null;
+            throw new RuntimeException(e);
         }
     }
 }
